@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monitoreo - Panel Principal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .navbar-custom {
+            background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #0284c7 100%);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        }
+        .stat-card {
+            border: none;
+            border-radius: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: #ffffff;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08) !important;
+        }
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .panel-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+            overflow: hidden;
+        }
+        .table thead th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark navbar-custom px-4 py-3">
+    <span class="navbar-brand mb-0 h1 fw-bold d-flex align-items-center">
+        <i class="bi bi-broadcast-pin text-warning me-2 fs-4"></i> Monitoreo
+    </span>
+    <div class="d-flex align-items-center text-white">
+        <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill me-3">
+            <i class="bi bi-person-circle me-1"></i> <span th:text="${session.usuario}">admin</span>
+        </span>
+        <a th:href="@{/logout}" class="btn btn-light text-primary fw-semibold btn-sm rounded-pill px-3">
+            <i class="bi bi-box-arrow-right me-1"></i> Salir
+        </a>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div th:if="${exito}" class="alert alert-success rounded-3 border-0 shadow-sm alert-dismissible fade show">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger rounded-3 border-0 shadow-sm alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card shadow-sm h-100 p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small fw-semibold mb-1">Sensores Registrados</p>
+                        <h2 class="fw-bold text-dark mb-0" th:text="${totalSensores}">0</h2>
+                    </div>
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card shadow-sm h-100 p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small fw-semibold mb-1">Sensores Activos</p>
+                        <h2 class="fw-bold text-success mb-0" th:text="${sensoresActivos}">0</h2>
+                    </div>
+                    <div class="icon-box bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-wifi"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card shadow-sm h-100 p-3">
+                <p class="text-muted small fw-semibold mb-2">Simulación en Tiempo Real</p>
+                <form th:action="@{/monitorear}" method="post">
+                    <button type="submit" class="btn btn-warning w-100 rounded-3 fw-semibold text-dark shadow-sm">
+                        <i class="bi bi-play-circle-fill me-1"></i> Ejecutar Lectura
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card shadow-sm h-100 p-3 border-start border-4 border-info">
+                <p class="text-muted small fw-semibold mb-2">Sensor Físico (USB)</p>
+                <button type="button" class="btn btn-info text-white w-100 rounded-3 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalHardware">
+                    <i class="bi bi-usb-symbol me-1"></i> Conectar Sensor Real
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card panel-card bg-white mb-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up text-primary me-2"></i>Tendencia de Últimas Lecturas</h6>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                <i class="bi bi-database-check me-1"></i>Sincronizando con MySQL
+            </span>
+        </div>
+        <div style="height: 200px;">
+            <canvas id="graficaSensores"></canvas>
+        </div>
+    </div>
+
+    <div class="card panel-card bg-white mb-4">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-diagram-3 text-primary me-2"></i>Gestión de Red de Sensores</h5>
+            <button class="btn btn-primary rounded-pill px-3 btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalNuevo">
+                <i class="bi bi-plus-lg me-1"></i> Nuevo Sensor
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead>
+                <tr>
+                    <th class="ps-4">ID</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Puerto</th>
+                    <th>Umbral Máx</th>
+                    <th>Estado</th>
+                    <th class="text-end pe-4">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${sensores}">
+                    <td class="ps-4 fw-bold text-primary" th:text="${s.idSensor}"></td>
+                    <td class="fw-medium" th:text="${s.nombre}"></td>
+                    <td>
+                        <span th:if="${s.tipo == 'TEMPERATURA'}" class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3">
+                            <i class="bi bi-thermometer-half me-1"></i>TEMPERATURA
+                        </span>
+                        <span th:if="${s.tipo == 'COLOR'}" class="badge rounded-pill bg-info bg-opacity-10 text-info px-3">
+                            <i class="bi bi-palette me-1"></i>COLOR
+                        </span>
+                        <span th:if="${s.tipo == 'DISTANCIA'}" class="badge rounded-pill bg-warning bg-opacity-25 text-dark px-3">
+                            <i class="bi bi-rulers me-1"></i>DISTANCIA
+                        </span>
+                        <span th:if="${s.tipo == 'HUMEDAD'}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3">
+                            <i class="bi bi-droplet-half me-1"></i>HUMEDAD
+                        </span>
+                    </td>
+                    <td th:text="${s.puerto}"></td>
+                    <td th:text="${s.umbralMax}"></td>
+                    <td>
+                        <span th:if="${s.activo}" class="badge rounded-pill bg-success"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>Activo</span>
+                        <span th:unless="${s.activo}" class="badge rounded-pill bg-secondary">Inactivo</span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-light border rounded-pill px-3 me-1" data-bs-toggle="modal" th:data-bs-target="'#edit-' + ${s.idSensor}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <a th:href="@{'/sensores/eliminar/' + ${s.idSensor}}" class="btn btn-sm btn-light border text-danger rounded-pill px-3" onclick="return confirm('¿Retirar este sensor de la red?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card panel-card bg-white">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-journal-text text-warning me-2"></i>Bitácora y Excepciones</h5>
+            <small class="text-muted" id="ultimaSync">Sincronizando con MySQL</small>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead>
+                <tr>
+                    <th class="ps-4">Fecha y Hora</th>
+                    <th>Sensor</th>
+                    <th>Valor</th>
+                    <th>Estado</th>
+                    <th class="pe-4">Detalle del Evento</th>
+                </tr>
+                </thead>
+                <tbody id="tablaBitacoraBody">
+                <tr th:each="log : ${bitacora}">
+                    <td class="ps-4 text-muted small" th:text="${log.fecha}"></td>
+                    <td class="fw-semibold" th:text="${log.sensor}"></td>
+                    <td class="fw-bold" th:text="${#numbers.formatDecimal(log.valor, 1, 2)}"></td>
+                    <td>
+                        <span th:if="${log.estado == 'NORMAL'}" class="badge rounded-pill bg-success bg-opacity-10 text-success px-3">NORMAL</span>
+                        <span th:if="${log.estado == 'ALERTA_ANOMALA'}" class="badge rounded-pill bg-warning bg-opacity-25 text-dark px-3">ANOMALÍA</span>
+                        <span th:if="${log.estado == 'ERROR_CONEXION'}" class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3">FALLO CONEXIÓN</span>
+                    </td>
+                    <td class="pe-4 small" th:text="${log.mensaje}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Conectar Sensor Real por Puerto Serie (USB) -->
+<div class="modal fade" id="modalHardware" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-usb-drive text-info me-2"></i>Conexión Física por Puerto Serie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted">Conecta tu placa (Arduino / ESP32) por USB enviando valores numéricos por Serial a <strong>9600 baudios</strong>.</p>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Selecciona el Sensor Destino en BD</label>
+                    <select id="sensorFisicoSelect" class="form-select">
+                        <option th:each="s : ${sensores}" th:value="${s.idSensor}" th:text="${s.idSensor + ' - ' + s.nombre}"></option>
+                    </select>
+                </div>
+                <div class="p-3 bg-dark text-success rounded-3 font-monospace text-center mb-3">
+                    <small class="d-block text-secondary">Lectura en vivo desde hardware:</small>
+                    <span id="lecturaVivoTexto" class="fs-2 fw-bold">--.--</span>
+                </div>
+                <div id="estadoSerial" class="small text-center text-muted">Esperando conexión USB...</div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" id="btnConectarUSB" class="btn btn-info text-white w-100 rounded-pill fw-bold">
+                    <i class="bi bi-plug-fill me-1"></i> Seleccionar Puerto COM y Leer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Sensor -->
+<div class="modal fade" id="modalNuevo" tabindex="-1">
+    <div class="modal-dialog">
+        <form th:action="@{/sensores/guardar}" method="post" class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold">Agregar Nuevo Sensor</h5></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label small fw-bold">ID Sensor</label><input type="text" name="idSensor" class="form-control" placeholder="DIST-02" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Nombre</label><input type="text" name="nombre" class="form-control" placeholder="Detector Ultrasónico" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Tipo de Sensor</label>
+                    <select name="tipo" class="form-select">
+                        <option value="TEMPERATURA">TEMPERATURA</option>
+                        <option value="COLOR">COLOR</option>
+                        <option value="DISTANCIA">DISTANCIA (Ultrasónico)</option>
+                        <option value="HUMEDAD">HUMEDAD</option>
+                    </select>
+                </div>
+                <div class="mb-3"><label class="form-label small fw-bold">Puerto</label><input type="number" name="puerto" class="form-control" value="8085" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Umbral Máximo</label><input type="number" step="0.1" name="umbralMax" class="form-control" value="100.0" required></div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">Guardar Sensor</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modales Editar Sensor -->
+<div th:each="s : ${sensores}" th:id="'edit-' + ${s.idSensor}" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <form th:action="@{/sensores/editar}" method="post" class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0"><h5 class="modal-title fw-bold" th:text="'Configurar ' + ${s.idSensor}"></h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="idSensor" th:value="${s.idSensor}">
+                <div class="mb-3"><label class="form-label small fw-bold">Nombre</label><input type="text" name="nombre" class="form-control" th:value="${s.nombre}" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Puerto</label><input type="number" name="puerto" class="form-control" th:value="${s.puerto}" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Umbral Máximo</label><input type="number" step="0.1" name="umbralMax" class="form-control" th:value="${s.umbralMax}" required></div>
+                <div class="form-check form-switch mt-3">
+                    <input class="form-check-input" type="checkbox" name="activo" th:checked="${s.activo}">
+                    <label class="form-check-label fw-semibold">Nodo Activo en la Red</label>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success rounded-pill px-4">Actualizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    const bitacoraInicial = /*[[${bitacora}]]*/ [];
+    const ctx = document.getElementById('graficaSensores').getContext('2d');
+
+    const chartSensores = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: bitacoraInicial.map(item => item.sensor + ' (' + item.fecha.substring(5, 16) + ')').reverse(),
+            datasets: [{
+                label: 'Valor Registrado',
+                data: bitacoraInicial.map(item => item.valor).reverse(),
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    async function sincronizarBitacoraBD() {
+        try {
+            const resp = await fetch('/api/bitacora');
+            if (!resp.ok) return;
+            const datos = await resp.json();
+
+            const tbody = document.getElementById('tablaBitacoraBody');
+            tbody.innerHTML = datos.map(log => {
+                let badge = '<span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3">NORMAL</span>';
+                if (log.estado === 'ALERTA_ANOMALA') {
+                    badge = '<span class="badge rounded-pill bg-warning bg-opacity-25 text-dark px-3">ANOMALÍA</span>';
+                } else if (log.estado === 'ERROR_CONEXION') {
+                    badge = '<span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3">FALLO CONEXIÓN</span>';
+                }
+                return `
+                    <tr>
+                        <td class="ps-4 text-muted small">${log.fecha}</td>
+                        <td class="fw-semibold">${log.sensor}</td>
+                        <td class="fw-bold">${Number(log.valor).toFixed(2)}</td>
+                        <td>${badge}</td>
+                        <td class="pe-4 small">${log.mensaje}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            chartSensores.data.labels = datos.map(i => i.sensor + ' (' + i.fecha.substring(5, 16) + ')').reverse();
+            chartSensores.data.datasets[0].data = datos.map(i => i.valor).reverse();
+            chartSensores.update('none');
+        } catch (e) {
+            console.error('Error sincronizando bitácora:', e);
+        }
+    }
+    setInterval(sincronizarBitacoraBD, 4000);
+
+    document.getElementById('btnConectarUSB').addEventListener('click', async () => {
+        if (!("serial" in navigator)) {
+            alert("Tu navegador no soporta Web Serial. Usa Google Chrome, Edge u Opera GX.");
+            return;
+        }
+        try {
+            const port = await navigator.serial.requestPort();
+            await port.open({ baudRate: 9600 });
+            document.getElementById('estadoSerial').innerText = "Conectado al puerto serie. Sincronizando con MySQL...";
+
+            const textDecoder = new TextDecoderStream();
+            port.readable.pipeTo(textDecoder.writable);
+            const reader = textDecoder.readable.getReader();
+
+            let buffer = "";
+            let ultimoEnvio = 0;
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buffer += value;
+                const lineas = buffer.split("\n");
+                buffer = lineas.pop();
+
+                for (const linea of lineas) {
+                    const numero = parseFloat(linea.trim());
+                    if (!isNaN(numero)) {
+                        document.getElementById('lecturaVivoTexto').innerText = numero.toFixed(2);
+                        const ahora = Date.now();
+                        if (ahora - ultimoEnvio > 3000) {
+                            ultimoEnvio = ahora;
+                            const idSensor = document.getElementById('sensorFisicoSelect').value;
+                            await fetch('/api/lectura-fisica', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ idSensor: idSensor, valor: numero })
+                            });
+                            sincronizarBitacoraBD();
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            document.getElementById('estadoSerial').innerText = "Conexión cancelada o error: " + err.message;
+        }
+    });
+</script>
+</body>
+</html>
