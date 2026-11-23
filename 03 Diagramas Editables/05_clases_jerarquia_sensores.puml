@@ -1,0 +1,40 @@
+@startuml
+interface ISensorRed {
+  + obtenerLectura(): double
+  + getTipo(): String
+}
+
+abstract class SensorBase {
+  # idSensor: String
+  # nombre: String
+  # puerto: int
+  # umbralMax: double
+  # activo: boolean
+}
+
+class SensorTemperatura {
+  + getTipo(): String
+  + obtenerLectura(): double
+}
+
+class SensorColor {
+  + getTipo(): String
+  + obtenerLectura(): double
+}
+
+class SensorDistancia {
+  + getTipo(): String
+  + obtenerLectura(): double
+}
+
+class SensorHumedad {
+  + getTipo(): String
+  + obtenerLectura(): double
+}
+
+ISensorRed <|.. SensorBase
+SensorBase <|-- SensorTemperatura
+SensorBase <|-- SensorColor
+SensorBase <|-- SensorDistancia
+SensorBase <|-- SensorHumedad
+@enduml

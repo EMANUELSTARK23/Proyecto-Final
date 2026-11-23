@@ -1,0 +1,18 @@
+@startuml
+autonumber
+
+actor Temporizador as Temp
+participant "gestor : GestorSensores" as Gestor
+participant "bitacora : ManejadorArchivos" as Log
+participant "archivo : bitacora_sensores.txt" as Archivo
+
+Gestor -> Gestor : calcularResumenCiclo()
+
+Gestor -> Log : guardarLog("Ciclo finalizado")
+Log -> Archivo : append("Ciclo finalizado")
+Archivo --> Log : guardado
+
+Log --> Gestor : ok
+Gestor --> Temp : cicloCompletado()
+
+@enduml

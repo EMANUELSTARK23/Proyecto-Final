@@ -1,0 +1,23 @@
+@startuml
+autonumber
+
+actor Temporizador as Temp
+participant "gestor : GestorSensores" as Gestor
+participant "sensor1 : SensorTemperatura" as S1
+participant "sensor2 : SensorColor" as S2
+participant "bitacora : ManejadorArchivos" as Log
+
+Temp -> Gestor : iniciarMonitoreo()
+
+Gestor -> S1 : obtenerLectura()
+S1 --x Gestor : LecturaAnomalaException
+
+Gestor -> Log : guardarLog("Error en sensor1")
+Log --> Gestor : ok
+
+Gestor -> S2 : obtenerLectura()
+S2 --> Gestor : lectura correcta
+
+Gestor --> Temp : cicloCompletado()
+
+@enduml

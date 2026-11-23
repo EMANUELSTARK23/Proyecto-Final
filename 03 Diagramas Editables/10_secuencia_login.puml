@@ -1,0 +1,26 @@
+@startuml
+autonumber
+actor Usuario
+participant "ctrl : IoTController" as Ctrl
+participant "dao : SensorDAOImpl" as DAO
+database "MySQL" as DB
+
+Usuario -> Ctrl : POST /login (username, password)
+activate Ctrl
+Ctrl -> DAO : validarLogin(username, password)
+activate DAO
+DAO -> DB : SELECT COUNT(*) WHERE password_hash = SHA2(?, 256)
+activate DB
+DB --> DAO : resultado
+deactivate DB
+DAO --> Ctrl : true / false
+deactivate DAO
+
+alt Credenciales válidas
+  Ctrl -> Ctrl : session.setAttribute("usuario", username)
+  Ctrl --> Usuario : redirect:/dashboard
+else Credenciales inválidas
+  Ctrl --> Usuario : redirect:/ (Mensaje de error)
+end
+deactivate Ctrl
+@enduml

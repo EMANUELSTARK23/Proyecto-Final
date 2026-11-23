@@ -1,0 +1,24 @@
+@startuml
+interface "GenericDAO<T, ID>" as GDAO {
+  + listarTodos(): List<T>
+  + buscarPorId(id: ID): T
+  + guardar(entidad: T): void
+  + actualizar(entidad: T): void
+  + eliminar(id: ID): void
+}
+
+class SensorDAOImpl {
+  - dataSource: DataSource
+  - instanciarSensor(tipo: String): SensorBase
+  + listarTodos(): List<SensorBase>
+  + buscarPorId(id: String): SensorBase
+  + guardar(s: SensorBase): void
+  + actualizar(s: SensorBase): void
+  + eliminar(id: String): void
+  + validarLogin(user: String, rawPass: String): boolean
+  + registrarBitacora(idSensor: String, valor: double, estado: String, msg: String): void
+  + obtenerBitacora(): List>
+}
+
+GDAO <|.. SensorDAOImpl
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+autonumber
+
+participant "gestor : GestorSensores" as Gestor
+participant "bitacora : ManejadorArchivos" as Log
+participant "archivo : bitacora_sensores.txt" as Archivo
+
+Gestor -> Log : guardarLog("Lectura normal: 24.5")
+activate Log
+
+Log -> Archivo : append("Lectura normal: 24.5")
+Archivo --> Log : escritura correcta
+
+Log --> Gestor : ok
+deactivate Log
+
+@enduml

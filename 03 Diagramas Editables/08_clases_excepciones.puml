@@ -1,0 +1,18 @@
+@startuml
+class Exception
+class IoTException {
+  + IoTException(msg: String)
+}
+interface ISensorRed {
+  + obtenerLectura(): double
+}
+class SensorDAOImpl {
+  + guardar(s: SensorBase): void
+  + actualizar(s: SensorBase): void
+  + eliminar(id: String): void
+}
+
+Exception <|-- IoTException
+ISensorRed ..> IoTException : <<throws>>
+SensorDAOImpl ..> Exception : <<throws>>
+@enduml

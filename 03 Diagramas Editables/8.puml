@@ -1,0 +1,23 @@
+@startuml 8
+left to right direction
+skinparam componentStyle rectangle
+
+actor "Administrador" as Admin
+actor "Temporizador" as Temp
+
+package "Plataforma de Monitoreo IoT" {
+
+    component "Módulo 1\nGestión y Configuración\nde Sensores" as M1
+
+    component "Módulo 2\nMonitoreo y Procesamiento\nde Lecturas" as M2
+
+    component "Módulo 3\nAlertas y Bitácora" as M3
+}
+
+Admin --> M1 : administra sensores
+M1 --> M2 : sensores configurados
+Temp --> M2 : inicia ciclo
+M2 --> M3 : lecturas y eventos
+M3 --> Admin : notificaciones
+
+@enduml

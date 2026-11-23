@@ -1,0 +1,10 @@
+Fallo crítico: Error de hardware en el sensor TEMP-001
+Lectura normal: 0.0
+Lectura normal: 20.72291935989444
+Fallo crítico: Error de hardware en el sensor TEMP-002
+ALERTA: Temperatura atípica en TEMP-001: 30.90°C
+Lectura normal: 0.0
+ALERTA: Temperatura atípica en TEMP-001: 33.17°C
+Lectura normal: 22.670410439300973
+Lectura normal: 25.07738046904885
+Lectura normal: 23.375044578536237

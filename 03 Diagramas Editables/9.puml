@@ -1,0 +1,16 @@
+@startuml
+autonumber
+
+actor Administrador as Admin
+participant "gestor : GestorSensores" as Gestor
+participant "sensor : SensorTemperatura" as Sensor
+participant "redSensores : List<ISensorRed>" as Red
+
+Admin -> Gestor : registrarSensor("TEMP-001", 30.0)
+Gestor -> Sensor : crear("TEMP-001", 30.0)
+Sensor --> Gestor : sensor creado
+Gestor -> Red : add(Sensor)
+Red --> Gestor : registro correcto
+Gestor --> Admin : sensor registrado
+
+@enduml

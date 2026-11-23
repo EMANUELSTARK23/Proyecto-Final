@@ -1,0 +1,19 @@
+@startuml
+autonumber
+
+participant "sensor : ISensorRed" as Sensor
+participant "gestor : GestorSensores" as Gestor
+participant "bitacora : ManejadorArchivos" as Log
+participant "archivo : bitacora_sensores.txt" as Archivo
+
+Gestor -> Sensor : conectar()
+
+Sensor --x Gestor : ConexionFallidaException
+
+Gestor -> Log : guardarLog("Fallo crítico de conexión")
+Log -> Archivo : append("Fallo crítico de conexión")
+Archivo --> Log : guardado
+
+Log --> Gestor : ok
+
+@enduml

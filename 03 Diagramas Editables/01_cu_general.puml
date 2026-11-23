@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+actor "Administrador" as Admin
+actor "Sensor Físico (USB)" as Hardware
+
+rectangle "Sistema de Monitoreo de Sensores" {
+  usecase "CU-01: Iniciar Sesión" as UC1
+  usecase "CU-02: Gestionar Red de Sensores" as UC2
+  usecase "CU-03: Ejecutar Ciclo de Lectura" as UC3
+  usecase "CU-04: Conectar Sensor Real (Serial)" as UC4
+  usecase "CU-05: Consultar Bitácora y Gráfica" as UC5
+  usecase "Registrar Excepción en BD" as UCEx
+}
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Hardware --> UC4
+
+UCEx ..> UC3 : <<extend>>\n[Fallo o Umbral Excedido]
+UCEx ..> UC4 : <<extend>>\n[Umbral Excedido]
+@enduml

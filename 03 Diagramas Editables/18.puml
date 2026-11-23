@@ -1,0 +1,25 @@
+@startuml
+autonumber
+
+actor Temporizador as Temp
+participant "gestor : GestorSensores" as Gestor
+participant "sensor1 : SensorTemperatura" as ST
+participant "sensor2 : SensorColor" as SC
+
+Temp -> Gestor : iniciarMonitoreo()
+
+Gestor -> ST : obtenerLectura()
+activate ST
+ST -> ST : calcularTemperatura()
+ST --> Gestor : 25.2
+deactivate ST
+
+Gestor -> SC : obtenerLectura()
+activate SC
+SC -> SC : calcularColor()
+SC --> Gestor : azul
+deactivate SC
+
+Gestor --> Temp : cicloCompletado()
+
+@enduml

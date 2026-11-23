@@ -1,0 +1,17 @@
+@startuml
+autonumber
+
+participant "sensor : ISensorRed" as Sensor
+participant "gestor : GestorSensores" as Gestor
+participant "bitacora : ManejadorArchivos" as Log
+participant "archivo : bitacora_sensores.txt" as Archivo
+
+Sensor --x Gestor : LecturaAnomalaException
+
+Gestor -> Log : guardarLog("ALERTA: lectura anómala")
+Log -> Archivo : append("ALERTA: lectura anómala")
+Archivo --> Log : guardado
+
+Log --> Gestor : ok
+
+@enduml

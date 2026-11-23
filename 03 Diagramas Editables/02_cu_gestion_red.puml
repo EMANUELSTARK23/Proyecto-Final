@@ -1,0 +1,19 @@
+@startuml
+left to right direction
+actor "Administrador" as Admin
+
+rectangle "Subsistema Gestión de Sensores" {
+  usecase "Listar Sensores" as UC1
+  usecase "Registrar Nuevo Sensor" as UC2
+  usecase "Editar Configuración y Umbral" as UC3
+  usecase "Eliminar Sensor" as UC4
+  usecase "Validar Campos Obligatorios" as UCVal
+}
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+UC2 ..> UCVal : <<include>>
+UC3 ..> UCVal : <<include>>
+@enduml

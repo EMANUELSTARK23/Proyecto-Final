@@ -1,0 +1,20 @@
+@startuml
+autonumber
+
+actor Administrador as Admin
+participant "gestor : GestorSensores" as Gestor
+participant "sensor : ISensorRed" as Sensor
+participant "bitacora : ManejadorArchivos" as Log
+
+Admin -> Gestor : conectarSensor(id)
+Gestor -> Sensor : conectar()
+activate Sensor
+Sensor -> Sensor : verificarHardware()
+Sensor --> Gestor : conexión correcta
+deactivate Sensor
+
+Gestor -> Log : guardarLog("Sensor conectado")
+Log --> Gestor : ok
+Gestor --> Admin : conexión exitosa
+
+@enduml

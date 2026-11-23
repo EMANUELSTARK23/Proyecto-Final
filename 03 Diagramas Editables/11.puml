@@ -1,0 +1,20 @@
+@startuml
+autonumber
+
+actor Administrador as Admin
+participant "gestor : GestorSensores" as Gestor
+participant "redSensores : List<ISensorRed>" as Red
+
+Admin -> Gestor : registrarSensor(id)
+Gestor -> Red : buscarPorId(id)
+Red --> Gestor : resultado
+
+alt ID ya registrado
+    Gestor --> Admin : mostrarError("ID duplicado")
+else ID disponible
+    Gestor -> Red : agregarSensor()
+    Red --> Gestor : ok
+    Gestor --> Admin : registro exitoso
+end
+
+@enduml

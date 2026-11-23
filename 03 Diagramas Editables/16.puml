@@ -1,0 +1,20 @@
+@startuml
+autonumber
+
+actor Temporizador as Temp
+participant "gestor : GestorSensores" as Gestor
+participant "redSensores : List<ISensorRed>" as Red
+participant "sensor : ISensorRed" as Sensor
+
+Temp -> Gestor : iniciarMonitoreo()
+Gestor -> Red : obtenerSensoresActivos()
+Red --> Gestor : listaActivos
+
+loop por cada sensor activo
+    Gestor -> Sensor : obtenerLectura()
+    Sensor --> Gestor : lectura
+end
+
+Gestor --> Temp : cicloCompletado()
+
+@enduml

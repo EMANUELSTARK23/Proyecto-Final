@@ -1,0 +1,20 @@
+@startuml
+autonumber
+
+participant "gestor : GestorSensores" as Gestor
+participant "sensor : SensorTemperatura" as Sensor
+participant "bitacora : ManejadorArchivos" as Log
+
+Gestor -> Sensor : obtenerLectura()
+activate Sensor
+
+Sensor -> Sensor : capturarTemperatura()
+Sensor -> Sensor : validarUmbral()
+
+Sensor --> Gestor : 24.5
+deactivate Sensor
+
+Gestor -> Log : guardarLog("Temperatura: 24.5")
+Log --> Gestor : ok
+
+@enduml

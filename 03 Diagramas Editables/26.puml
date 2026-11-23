@@ -1,0 +1,22 @@
+@startuml
+autonumber
+
+participant "gestor : GestorSensores" as Gestor
+participant "bitacora : ManejadorArchivos" as Log
+participant "archivo : bitacora_sensores.txt" as Archivo
+participant "consola : InterfazUsuario" as UI
+
+Gestor -> Log : guardarLog(mensaje)
+activate Log
+
+Log -> Archivo : append(mensaje)
+
+Archivo --x Log : IOException
+
+Log -> UI : mostrar("No se pudo escribir la bitácora")
+UI --> Log : mensaje mostrado
+
+Log --> Gestor : fallo controlado
+deactivate Log
+
+@enduml

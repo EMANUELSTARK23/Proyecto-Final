@@ -1,0 +1,19 @@
+@startuml
+autonumber
+
+actor Administrador as Admin
+participant "gestor : GestorSensores" as Gestor
+participant "sensor : ISensorRed" as Sensor
+participant "bitacora : ManejadorArchivos" as Log
+
+Admin -> Gestor : desconectarSensor(id)
+Gestor -> Sensor : desconectar()
+Sensor -> Sensor : cambiarEstado(false)
+Sensor --> Gestor : desconectado
+
+Gestor -> Log : guardarLog("Sensor desconectado")
+Log --> Gestor : ok
+
+Gestor --> Admin : operación completada
+
+@enduml

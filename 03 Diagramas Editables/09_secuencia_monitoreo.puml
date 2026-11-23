@@ -1,0 +1,31 @@
+@startuml
+autonumber
+actor Administrador
+participant "ctrl : IoTController" as Ctrl
+participant "dao : SensorDAOImpl" as DAO
+participant "sensor : SensorBase" as Sensor
+database "MySQL" as DB
+
+Administrador -> Ctrl : POST /monitorear
+activate Ctrl
+Ctrl -> DAO : listarTodos()
+activate DAO
+DAO --> Ctrl : List<SensorBase>
+deactivate DAO
+
+loop Por cada sensor en la lista
+  Ctrl -> Sensor : obtenerLectura()
+  activate Sensor
+  alt Lectura dentro de umbral
+    Sensor --> Ctrl : valor (double)
+    Ctrl -> DAO : registrarBitacora(id, valor, "NORMAL", msg)
+  else Sensor inactivo o supera umbralMax
+    Sensor --> Ctrl : throws IoTException
+    deactivate Sensor
+    Ctrl -> DAO : registrarBitacora(id, 0.0, "ALERTA/ERROR", e.getMessage())
+  end
+end
+
+Ctrl --> Administrador : redirect:/dashboard
+deactivate Ctrl
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+class IoTController {
+  - dao: SensorDAOImpl
+  + loginPage(session: HttpSession): String
+  + procesarLogin(username: String, password: String): String
+  + dashboard(session: HttpSession, model: Model): String
+  + guardarSensor(...): String
+  + editarSensor(...): String
+  + eliminarSensor(id: String): String
+  + ejecutarMonitoreo(session: HttpSession): String
+  + guardarLecturaFisica(payload: Map): ResponseEntity
+}
+
+interface "GenericDAO<T, ID>" as GDAO
+class SensorDAOImpl
+abstract class SensorBase
+
+IoTController --> SensorDAOImpl : utiliza
+GDAO <|.. SensorDAOImpl
+SensorDAOImpl ..> SensorBase : gestiona
+@enduml

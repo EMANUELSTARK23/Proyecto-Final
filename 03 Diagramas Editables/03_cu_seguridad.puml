@@ -1,0 +1,16 @@
+@startuml
+left to right direction
+actor "Usuario" as User
+
+rectangle "Subsistema de Seguridad" {
+  usecase "Autenticar Credenciales" as UCLogin
+  usecase "Verificar Hash SHA-256" as UCSha
+  usecase "Bloquear Acceso por URL Directa" as UCBlock
+  usecase "Cerrar Sesión" as UCLogout
+}
+
+User --> UCLogin
+User --> UCLogout
+UCLogin ..> UCSha : <<include>>
+UCBlock ..> UCLogin : <<extend>>
+@enduml

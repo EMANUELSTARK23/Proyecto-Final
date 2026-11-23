@@ -1,0 +1,15 @@
+@startuml
+class IoTController {
+  - dao: SensorDAOImpl
+  + loginPage(session: HttpSession): String
+  + procesarLogin(username: String, password: String, session: HttpSession, ra: RedirectAttributes): String
+  + logout(session: HttpSession): String
+  + dashboard(session: HttpSession, model: Model): String
+  + guardarSensor(idSensor: String, nombre: String, tipo: String, puerto: int, umbralMax: double): String
+  + editarSensor(idSensor: String, nombre: String, puerto: int, umbralMax: double, activo: boolean): String
+  + eliminarSensor(id: String): String
+  + ejecutarMonitoreo(session: HttpSession, ra: RedirectAttributes): String
+  + obtenerBitacoraJson(session: HttpSession): ResponseEntity<List>>
+  + guardarLecturaFisica(payload: Map<String, Object>, session: HttpSession): ResponseEntity<String>
+}
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+autonumber
+
+actor Administrador as Admin
+participant "gestor : GestorSensores" as Gestor
+participant "sensor : SensorTemperatura" as Sensor
+
+Admin -> Gestor : configurarUmbral("TEMP-001", 30.0)
+Gestor -> Sensor : setUmbralMaximo(30.0)
+Sensor -> Sensor : validarUmbral()
+Sensor --> Gestor : configuración aceptada
+Gestor --> Admin : umbral actualizado
+
+@enduml
